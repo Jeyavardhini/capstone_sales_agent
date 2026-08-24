@@ -52,9 +52,14 @@ sales_prompt = ChatPromptTemplate.from_messages([
         4. Competitors
         5. Value Proposition
         6. Target Customer
-        7. Important Research Questions
+        7. Important product Details from the uploaded document
+        8. Important Research Questions
+
+        If no product document was provided, state:
+        "No product overview document provided." 
         """
     )
+    
 ])
 
 # Connect the prompt, AI model, and output parser

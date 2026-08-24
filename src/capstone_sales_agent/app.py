@@ -6,6 +6,7 @@ from agents.research import run_research_agent
 from agents.analysis import run_analysis_agent
 from agents.report import run_report_agent
 from tools.web_research import fetch_multiple_pages
+from tools.document_reader import read_pdf, read_docx
 
 
 st.set_page_config(
@@ -25,6 +26,10 @@ company_url = st.text_input("Company URL")
 product_category = st.text_input("Product Category")
 
 competitors = st.text_input("Competitors")
+competitor_urls = st.text_area(
+    "Competitor Research URLs",
+    placeholder="Enter one competitor URL per line"
+)
 
 value_proposition = st.text_area("Value Proposition")
 
@@ -41,9 +46,23 @@ uploaded_file = st.file_uploader(
 product_document_text = ""
 
 if uploaded_file is not None:
-    if uploaded_file.type == "text/plain":
-        product_document_text = uploaded_file.read().decode("utf-8")
+    file_bytes = uploaded_file.read()
 
+    if uploaded_file.type == "text/plain":
+        product_document_text = file_bytes.decode("utf-8")
+
+    elif uploaded_file.type == "application/pdf":
+        product_document_text = read_pdf(file_bytes)
+
+    elif uploaded_file.type == (
+        "application/vnd.openxmlformats-officedocument."
+        "wordprocessingml.document"
+    ):
+        product_document_text = read_docx(file_bytes)
+
+
+
+        
 
 
 if st.button("Generate Sales Brief"):
@@ -76,6 +95,15 @@ if st.button("Generate Sales Brief"):
             ]
 
             source_urls.extend(extra_urls)
+
+        if competitor_urls.strip():
+            competitor_url_list = [
+                url.strip()
+                for url in competitor_urls.splitlines()
+                if url.strip()
+            ]
+
+            source_urls.extend(competitor_url_list)
 
         with st.spinner(
             "Researching company and generating sales brief..."

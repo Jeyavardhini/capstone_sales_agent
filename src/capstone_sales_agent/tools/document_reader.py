@@ -1,6 +1,8 @@
+
 from io import BytesIO
 
 from pypdf import PdfReader
+from docx import Document
 
 
 def read_pdf(file_bytes: bytes, max_characters: int = 12000) -> str:
@@ -19,5 +21,27 @@ def read_pdf(file_bytes: bytes, max_characters: int = 12000) -> str:
 
     if not text:
         return "No readable text was found in the uploaded PDF."
+
+    return text[:max_characters]
+
+
+def read_docx(file_bytes: bytes, max_characters: int = 12000) -> str:
+    """Extract text from an uploaded DOCX document."""
+
+    if not file_bytes:
+        return ""
+
+    document = Document(BytesIO(file_bytes))
+
+    paragraphs = [
+        paragraph.text
+        for paragraph in document.paragraphs
+        if paragraph.text.strip()
+    ]
+
+    text = "\n".join(paragraphs).strip()
+
+    if not text:
+        return "No readable text was found in the uploaded DOCX."
 
     return text[:max_characters]

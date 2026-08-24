@@ -17,43 +17,106 @@ research_prompt = ChatPromptTemplate.from_messages([
         """
         You are a Company Research Agent.
 
-        Your job is to identify what information should be
-        researched about a prospective customer.
+        Your job is to analyze publicly available company
+        information for a sales representative.
 
-        Focus only on information relevant to the sales opportunity.
+        You MUST base your findings only on:
+        1. The supplied Sales Agent information
+        2. The supplied web content
+        3. The supplied source URLs
 
         Do not invent facts.
-        Do not make the final recommendation.
+        Do not assume information that is not supported by
+        the supplied web content.
+
+        If information cannot be verified from the supplied
+        sources, clearly state:
+        "Not verified from the provided sources."
+
+        Do not make the final sales recommendation.
         """
     ),
     (
         "human",
         """
-        Sales Agent information:
+        SALES AGENT INFORMATION:
 
         {sales_information}
 
-        Identify research areas for:
+
+        PUBLIC WEB CONTENT:
+
+        {web_content}
+
+
+        SOURCE URLS:
+
+        {source_url}
+
+
+        Using ONLY the information above, research and summarize:
 
         1. Company Strategy
+        - Relevant company initiatives
+        - Business priorities
+        - Public strategy statements
+
         2. Technology Strategy
+        - Technology platforms
+        - Cloud or data initiatives
+        - Technology-stack indicators
+
         3. Competitor Mentions
-        4. Leadership
-        5. Relevant Products or Services
+        - Identify mentions of competitors supplied by the Sales Agent
+        - Explain the context of those mentions
+        - Do not claim a competitor relationship unless supported by the sources
+
+        4. Leadership Information
+        - Relevant executives or leaders
+        - Public statements related to the sales opportunity
+        - Clearly identify information that cannot be verified
+
+        5. Products and Services
+        - Relevant products
+        - Services
+        - Strategic initiatives
+
         6. Recent Company News
-        7. Job Postings or Technology Indicators
-        8. Potential Sales Opportunity
+        - Relevant announcements
+        - Press releases
+        - Strategic developments contained in the provided web content
+
+        7. Technology and Hiring Indicators
+        - Job-posting information if present
+        - Technology skills or platforms mentioned
+        - Other indicators of company technology direction
+
+        8. Potential Sales Relevance
+        - Explain how the verified research may relate to the product being sold
+        - Clearly separate verified facts from interpretation
+
+        9. Sources Used
+        - List the supplied source URLs
+        - Do not create or invent additional URLs
+
+        IMPORTANT:
+        Every factual statement must be based on the supplied web content.
+        If there is insufficient evidence, say so explicitly.
         """
     )
 ])
 
-research_chain = research_prompt | model | StrOutputParser()
+research_chain = (
+    research_prompt
+    | model
+    | StrOutputParser()
+)
 
 
 def run_research_agent(sales_information, web_content, source_url):
-    {source_url}
     return research_chain.invoke({
         "sales_information": sales_information,
         "web_content": web_content,
         "source_url": source_url
     })
+
