@@ -42,7 +42,9 @@ sales_prompt = ChatPromptTemplate.from_messages([
 
         Value Proposition: {value_proposition}
 
-        Target Customer: {target_customer}
+        Target Customer: {target_customer} 
+        Product Overview Document:
+        {product_document}
 
         Return the following:
 
